@@ -12,6 +12,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -91,8 +92,39 @@ public class LoginController {
      * @param request
      * @return
      */
+//    @PostMapping("/login")
+//    public String login(@Validated @ModelAttribute LoginForm form, BindingResult bindingResult, HttpServletRequest request) {
+//
+//        if (bindingResult.hasErrors()) {
+//            return "login/loginForm";
+//        }
+//
+//        Member loginMember = loginService.login(form.getLoginId(), form.getPassword());
+//
+//        if (loginMember == null) {
+//            bindingResult.reject("loginFail", "아이디 또는 비밀번호가 맞지 않습니다.");
+//            return "login/loginForm";
+//        }
+//
+//        HttpSession session = request.getSession();
+//        session.setAttribute(SessionConst.LOGIN_MEMBER, loginMember);
+//
+//        return "redirect:/";
+//    }
+
+
+    /**
+     * HTTP 세션을 이용한 로그인, 요청 화면 기억
+     * @param form 커맨드 객체
+     * @param bindingResult 에러 저장
+     * @param redirectURL 미인증 사용자 요청 시 로그인으로 redirect 하면서 쿼리스트링으로 요청한 url을 넘기는데, 그 url을 RequestParam으로 받음
+     * @param request HTTP 요청
+     * @return
+     */
     @PostMapping("/login")
-    public String login(@Validated @ModelAttribute LoginForm form, BindingResult bindingResult, HttpServletRequest request) {
+    public String login(@Validated @ModelAttribute LoginForm form, BindingResult bindingResult,
+                        @RequestParam(defaultValue = "/") String redirectURL,
+                        HttpServletRequest request) {
 
         if (bindingResult.hasErrors()) {
             return "login/loginForm";
@@ -108,7 +140,7 @@ public class LoginController {
         HttpSession session = request.getSession();
         session.setAttribute(SessionConst.LOGIN_MEMBER, loginMember);
 
-        return "redirect:/";
+        return "redirect:" + redirectURL;
     }
 
 
@@ -125,7 +157,7 @@ public class LoginController {
 
     /**
      * 로그아웃
-     * @param request 쿠키 저장
+     * @param request
      * @return
      */
 //    @PostMapping("/logout")
@@ -136,7 +168,7 @@ public class LoginController {
 
     /**
      * 로그아웃
-     * @param response 쿠키 저장
+     * @param request
      * @return
      */
     @PostMapping("/logout")
